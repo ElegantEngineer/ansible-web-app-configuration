@@ -1,0 +1,126 @@
+#####################
+# AWS CLI credential blobs
+#####################
+.aws/credentials
+aws/credentials
+
+#####################
+# Private RSA SSH keys
+#####################
+/ssh/id_rsa
+id_rsa
+.id_rsa
+
+#####################
+# Private DSA SSH keys
+#####################
+/ssh/id_dsa
+id_dsa
+.id_dsa
+
+#####################
+# Private ed25519 SSH keys
+#####################
+/ssh/id_ed25519
+/.ssh/personal_ed25519
+/config/server_ed25519
+id_ed25519
+.id_ed25519
+
+#####################
+# Private ECDSA SSH keys
+#####################
+/ssh/id_ecdsa
+/.ssh/personal_ecdsa
+/config/server_ecdsa
+id_ecdsa
+.id_ecdsa
+
+#####################
+# Any file with .pem or .key extensions
+#####################
+*.pem
+*.key
+
+#####################
+# Any file ending with _history or .history extension
+#####################
+*.history
+*_history
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+dist/
+downloads/
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+.hypothesis/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# celery beat schedule file
+celerybeat-schedule
+
+# dotenv
+.env
+
+# virtualenv
+venv/
+ENV/
+
+# Spyder project settings
+.spyderproject
+
+# InetlliJ platform
+.idea
+
+.DS_Store
+
+Pipfile.lock
+
+.vscode/
+
+#db-files
+sqlite3
+db.sqlite3
+dump.rdb

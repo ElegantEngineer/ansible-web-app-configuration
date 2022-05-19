@@ -1,0 +1,15 @@
+---
+cluster_web:
+  hosts:
+    web-ru-1:
+      ansible_host: "{{ lookup('env', 'frontend_host') }}"
+
+cluster_backend:
+  hosts:
+    backend-ru-1:
+      ansible_host: "{{ lookup('env', 'backend_host') }}"
+
+datacenter:
+  children:
+    cluster_web:
+    cluster_backend:

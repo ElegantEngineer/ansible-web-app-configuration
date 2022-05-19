@@ -1,0 +1,21 @@
+### Copy and unpack archive
+
+- name: Copy archive
+  copy:
+    src: '{{ local_src_path_to_archive }}'
+    dest: '{{ remote_dst_path_to_archive }}'
+  when: local_src_path_to_archive is defined
+
+- name: Unarchive copied archive
+  unarchive:
+    src: '{{ remote_dst_path_to_archive }}'
+    dest: '{{ remote_unarchive_dst }}'
+    remote_src: yes
+    list_files: yes
+  when: remote_dst_path_to_archive is defined
+  register: remote_unarchive_output
+
+- name: Print unarchived files
+  debug:
+    msg:
+      standard output is "{{ remote_unarchive_output }}"

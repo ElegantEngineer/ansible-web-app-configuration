@@ -1,0 +1,21 @@
+---
+
+- name: Update hosts files with hostnames and their ip addresses according the datacenter structure 
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '{{ hostvars[item].ansible_default_ipv4.address }}.*{{ item }}'
+    line: "{{ hostvars[item]['ansible_default_ipv4']['address'] }} {{ item }}"
+    state: present
+    backup: yes
+  when: hostvars[item]['ansible_facts']['default_ipv4'] is defined
+  with_items: "{{ groups['datacenter'] }}"
+
+- name: Allow TCP local network interactions on firewall
+  ufw: from="{{ hostvars[item]['ansible_default_ipv4']['address'] }}" proto=tcp port="{{ allowed_local_tcp_ports }}" rule=allow
+  when: hostvars[item]['ansible_facts']['default_ipv4'] is defined
+  with_items: "{{ groups['datacenter'] }}"
+
+- name: Allow UDP local network interactions on firewall
+  ufw: from="{{ hostvars[item]['ansible_default_ipv4']['address'] }}" proto=udp port="{{ allowed_local_udp_ports }}" rule=allow
+  when: hostvars[item]['ansible_facts']['default_ipv4'] is defined
+  with_items: "{{ groups['datacenter'] }}"

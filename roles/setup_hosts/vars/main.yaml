@@ -1,0 +1,4 @@
+---
+allowed_local_tcp_ports: '2377,7946'
+allowed_local_udp_ports: '4789'
+...

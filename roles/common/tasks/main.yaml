@@ -1,0 +1,137 @@
+---
+
+- name: Set hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Update apt repos
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+    cache_valid_time: 3600
+
+- name: Setup File2Ban
+  apt:
+    name: fail2ban
+    state: present
+
+- name: Enable and start Fail2Ban by Systemd
+  systemd:
+    name: fail2ban
+    enabled: yes
+    state: started
+
+- name: Setup ufw
+  apt:
+    name=ufw
+- name: Allow ssh through firewall
+  ufw:
+    proto=tcp port=22 rule=allow
+- name: Set ufw policy
+  ufw:
+    state=enabled direction=incoming policy=deny
+
+- name: Setup NTP
+  apt:
+    name: ntp
+    state: latest
+
+- name: Enable and start NTP by Systemd
+  systemd:
+    name: ntp
+    enabled: yes
+    state: started
+
+- name: Setting timezone
+  timezone:
+    name: "{{ ntp_timezone }}"
+  notify: ntp restart
+
+- name: Deactivate PermitRootLogin
+  lineinfile:
+    path: "/etc/ssh/sshd_config"
+    line: "PermitRootLogin no"
+    state: present
+  notify:
+    - sshd restart
+
+- name: Ensure PermitRootLogin is not activated
+  lineinfile:
+    path: "/etc/ssh/sshd_config"
+    line: "PermitRootLogin yes"
+    state: absent
+  notify:
+    - sshd restart
+
+- name: Deactivate PasswordAuthentication
+  lineinfile:
+    path: "/etc/ssh/sshd_config"
+    line: "PasswordAuthentication no"
+    state: present
+  notify:
+    - sshd restart
+
+- name: Ensure PasswordAuthentication is not activated
+  lineinfile:
+    path: "/etc/ssh/sshd_config"
+    line: "PasswordAuthentication yes"
+    state: absent
+  notify:
+    - sshd restart
+
+- name: Ensure AllowUsers for ssh access
+  lineinfile:
+    path: "/etc/ssh/sshd_config"
+    line: "AllowUsers {{ lookup('env', 'LOGNAME') }} {{ lookup('env', 'deployuser') or 'deploymaster' }}"
+    state: present
+  notify:
+    - sshd restart
+
+- name: Install Docker system packages
+  apt: name={{ item }} state=present update_cache=yes
+  loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common' ]
+
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker Repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+    state: present
+
+- name: Install Docker Compose 
+  get_url:
+    url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64
+    dest: "/usr/local/bin/docker-compose"
+    mode: 0755
+  register: output
+
+- debug:
+    var: output
+
+- name: install pip3
+  apt:
+    name: python3-pip
+    state: latest
+
+- name: install certain python modules for docker
+  pip:
+    name: "{{ item.name }}"
+    version: "{{ item.version }}"
+    state: present
+  with_items:
+  - { name: docker, version: "{{ docker_pip_version }}" }
+
+- name: Ensure group "docker" exists
+  group:
+    name: docker
+    state: present
+    system: yes
+
+- name: Add deploy user to docker group
+  ansible.builtin.user:
+    name: "{{ lookup('env', 'deployuser') or 'deploymaster' }}"
+    groups: docker
+    append: yes

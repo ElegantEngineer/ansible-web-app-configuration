@@ -1,0 +1,30 @@
+---
+
+- name: Update apt and install docker-ce
+  apt: update_cache=yes name=docker-ce state=latest
+
+- name: Set vm.overcommit_memory to 1 to follow Redis hints
+  sysctl:
+    name: vm.overcommit_memory
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Create a ext4 filesystem on data_disk_name
+  filesystem:
+    fstype: ext4
+    dev: /dev/{{ data_disk_name }}
+
+- name: Mount up db_data disk
+  mount:
+    path: /database
+    src: /dev/{{ data_disk_name }}
+    fstype: ext4
+    state: mounted
+
+- name: docker systemd
+  systemd:
+    name: docker
+    enabled: yes
+    state: started

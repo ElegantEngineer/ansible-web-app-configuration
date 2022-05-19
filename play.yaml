@@ -1,0 +1,36 @@
+---
+- hosts: cluster_web
+  become: yes
+  become_method:
+    sudo
+  remote_user:
+    "{{ lookup('env', 'LOGNAME') }}"
+  roles:
+   - role: common
+     tags: common
+   - role: setup_web
+     tags: setup_web
+   - role: archive_delivery
+     tags: archive_delivery
+
+- hosts: cluster_backend
+  become: yes
+  become_method:
+    sudo
+  remote_user:
+    "{{ lookup('env', 'LOGNAME') }}"
+  roles:
+   - role: common
+     tags: common
+   - role: setup_backend
+     tags: setup_backend
+
+- hosts: datacenter
+  become: yes
+  become_method:
+    sudo
+  remote_user:
+    "{{ lookup('env', 'LOGNAME') }}"
+  roles:
+   - role: setup_hosts
+     tags: setup_hosts
